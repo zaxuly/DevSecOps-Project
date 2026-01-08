@@ -1,0 +1,31 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: easyvault_web
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    container_name: easyvault_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: easyvault
+      MYSQL_USER: easyvault_user
+      MYSQL_PASSWORD: strongpassword
+      MYSQL_ROOT_PASSWORD: rootpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password
+
+volumes:
+  mysql_data:
+  
